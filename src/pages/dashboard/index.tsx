@@ -1,13 +1,11 @@
 // pages/dashboard.tsx
 import React from 'react';
-
+import Card from '@/components/Card';
 const Dashboard = () => {
   return (
-    <div className="flex h-screen">
-
-      <h2 className="text-xl font-semibold mb-4">Dashboard</h2>
-
-    </div>
+    <Card withAction={false} title="Dashboard" className="card-lg">
+      <React.Fragment></React.Fragment>
+    </Card>
   );
 };
 
