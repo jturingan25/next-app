@@ -16,7 +16,7 @@ export default function Card({ children, withAction = false, title, className }:
 				{children}
 				{withAction && (
 					<div className="card-actions justify-end">
-						<button className="btn btn-primary">Buy Now</button>
+						<button className="btn btn-primary">Submit</button>
 					</div>
 				)}
 			</div>
