@@ -1,43 +1,44 @@
-'use client'
 import React, { useEffect, useState } from 'react'
 import Card from '@/components/Card';
+import Button from '@/components/Button';
 import dynamic from 'next/dynamic';
 import StyledTreeNode from './components/StyledTreeNode';
-
+import { IconDownload, IconPrint, IconSettings } from '@/components/Icons';
+import Drawer from '@/components/Drawer';
+import {printDiv} from '@/utils/utility';
 const Tree = dynamic(() => import('react-organizational-chart').then(mod => mod.Tree), { ssr: false });
 const TreeNode = dynamic(() => import('react-organizational-chart').then(mod => mod.TreeNode), { ssr: false });
 
 interface TreeNodeData {
   id: number;
-  label: string;
+  name: string;
+  position: string;
   children?: TreeNodeData[];
 }
 
 const OrgChartPage: React.FC = () => {
+  useEffect(() => {
+    window.onafterprint = function () {
+      // Reload the page after print
+      window.location.reload();
+    };
+  }, [])
   // Organize data with type-safe structure
   const [orgData, setOrgData] = useState<TreeNodeData[]>([
     {
-      id: 1, label: 'CEO', children: [
+      id: 1, name: 'Bing Tan', position: 'CEO', children: [
+
+        { id: 2, name: 'Laarni Manlangit', position: 'Human Resource' },
         {
-          id: 2, label: 'CTO', children: [
-            { id: 3, label: 'Dev Team 1' },
-            { id: 4, label: 'Dev Team 2' }
+          id: 5, name: 'Fervi', position: 'Project Manager', children: [
+            { id: 5.1, name: 'Tonio', position: 'Senior Software Engr.' },
+            { id: 5.2, name: 'Nathan', position: 'Senior Software Engr.' },
+            { id: 5.2, name: 'Jan', position: 'Junior Software Engr.' },
           ]
+
         },
-        {
-          id: 5, label: 'CFO', children: [{
-            id: 6, label: 'Finance Team',
-          }, {
-            id: 82, label: "Accounting Team"
-          }]
-        },
-        {
-          id: 51, label: 'COO', children: [
-            { id: 62, label: 'Operation Team' },
-            { id: 65, label: 'Field Team' }
-          ]
-        },
-        { id: 52, label: 'CMO', children: [{ id: 61, label: 'Marketing Team' }] }
+        { id: 3, name: 'Dhom', position: 'Project Manager' },
+        { id: 4, name: 'Bon', position: 'Project Manager' },
       ]
     }
   ]);
@@ -64,6 +65,7 @@ const OrgChartPage: React.FC = () => {
 
     setOrgData(finalOrgData);
   };
+
   const removeNode = (tree: TreeNodeData[], nodeToRemove: TreeNodeData): TreeNodeData[] => {
     return tree
       .map(node => {
@@ -110,11 +112,44 @@ const OrgChartPage: React.FC = () => {
     ));
   };
 
+
+  const download = () => {
+    alert("download")
+  }
+
+  const extraButton = (
+    <div className='flex'>
+      <Drawer className="mr-5" />
+      <Button type='dropdown' label={<IconSettings />}>
+        <li onClick={() => printDiv("orgchart")}><a><IconPrint /> Print</a></li>
+        <li onClick={download}><a><IconDownload />Download</a></li>
+      </Button>
+
+    </div >
+  );
+
   return (
-    <Card withAction={false} title="Organizational Chart" className="card-lg">
-      <Tree label={orgData[0].label}>
-        {renderTreeNodes(orgData[0].children!)}
-      </Tree>
+    <Card
+      title="Organizational Chart"
+      extraButton={
+        extraButton
+      }
+    >
+      <div id="orgchart">
+        <Tree
+
+          label={
+            <StyledTreeNode
+              handleDragStart={handleDragStart}
+              handleDragOver={handleDragOver}
+              handleDrop={handleDrop}
+              node={orgData[0]}
+            />
+          }
+        >
+          {renderTreeNodes(orgData[0].children!)}
+        </Tree>
+      </div>
     </Card>
   )
 }

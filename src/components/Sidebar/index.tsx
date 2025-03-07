@@ -11,7 +11,7 @@ const Sidebar = () => {
         <details>
           <summary className="group">Settings</summary>
           <ul className="menu p-4 w-60 bg-base-100 text-base-content">
-            <li><a href="#">User</a></li>
+            <li><a href="/user">User</a></li>
           </ul>
         </details>
       </li>
