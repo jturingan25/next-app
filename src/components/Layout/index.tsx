@@ -13,7 +13,6 @@ const Layout = ({ children }: LayoutProps) => {
         <TopBar />
         {/* Main content */}
         <main className="flex-1 p-4 bg-base-200">
- 
           {children}
         </main>
       </div>

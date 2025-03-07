@@ -4,7 +4,7 @@ import Sidebar from '../Sidebar';
 
 const TopBar = () => {
   return (
-    <div className="bg-base-100/90 text-base-content shadow-sm sticky top-0 z-30 flex h-16 w-full [transform:translate3d(0,0,0)] justify-center backdrop-blur transition-shadow duration-100 print:hidden" >
+    <div className="bg-purple-950 text-base-300 shadow-sm sticky top-0 z-30 flex h-16 w-full [transform:translate3d(0,0,0)] justify-center backdrop-blur transition-shadow duration-100 print:hidden" >
       <div className="flex-none p-5">
 
         <div className="drawer">
@@ -29,16 +29,14 @@ const TopBar = () => {
 
           </div>
           <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="btn btn-circle btn-ghost avatar">
-              <div className="w-10 rounded-full">
-                <img
-                  alt="Tailwind CSS Navbar component"
-                  src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+            <div tabIndex={0} role="button" className="btn btn-circle avatar-placeholder btn-ghost avatar">
+              <div className="w-8 rounded-full bg-base-300 text-black ">
+                <span className="text-xl">JT</span>
               </div>
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+              className="menu menu-sm dropdown-content bg-base-100 text-black rounded-box z-1 mt-3 w-52 p-2 shadow">
               <li>
                 <a className="justify-between">
                   Profile

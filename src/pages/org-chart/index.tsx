@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Card from '@/components/Card';
 import dynamic from 'next/dynamic';
+import StyledTreeNode from './components/StyledTreeNode';
 
 const Tree = dynamic(() => import('react-organizational-chart').then(mod => mod.Tree), { ssr: false });
 const TreeNode = dynamic(() => import('react-organizational-chart').then(mod => mod.TreeNode), { ssr: false });
@@ -23,7 +24,20 @@ const OrgChartPage: React.FC = () => {
             { id: 4, label: 'Dev Team 2' }
           ]
         },
-        { id: 5, label: 'CFO', children: [{ id: 6, label: 'Finance Team' }] }
+        {
+          id: 5, label: 'CFO', children: [{
+            id: 6, label: 'Finance Team',
+          }, {
+            id: 82, label: "Accounting Team"
+          }]
+        },
+        {
+          id: 51, label: 'COO', children: [
+            { id: 62, label: 'Operation Team' },
+            { id: 65, label: 'Field Team' }
+          ]
+        },
+        { id: 52, label: 'CMO', children: [{ id: 61, label: 'Marketing Team' }] }
       ]
     }
   ]);
@@ -83,14 +97,12 @@ const OrgChartPage: React.FC = () => {
       <TreeNode
         key={node.id}
         label={
-          <div
-            onDragStart={(e: React.DragEvent<HTMLDivElement>) => handleDragStart(e, node)}
-            onDragOver={(e: React.DragEvent<HTMLDivElement>) => handleDragOver(e)} // Typing event explicitly
-            onDrop={(e: React.DragEvent<HTMLDivElement>) => handleDrop(e, node)} // Typing event explicitly
-            draggable
-          >
-            {node.label}
-          </div>
+          <StyledTreeNode
+            handleDragStart={handleDragStart}
+            handleDragOver={handleDragOver}
+            handleDrop={handleDrop}
+            node={node}
+          />
         }
       >
         {node.children && renderTreeNodes(node.children)}
@@ -107,3 +119,6 @@ const OrgChartPage: React.FC = () => {
   )
 }
 export default OrgChartPage;
+
+
+
