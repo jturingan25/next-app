@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
+'use client';
+import React, { useEffect, useState, useRef } from 'react'
 import Card from '@/components/Card';
 import Button from '@/components/Button';
 import dynamic from 'next/dynamic';
 import StyledTreeNode from './components/StyledTreeNode';
-import { IconDownload, IconPrint, IconSettings } from '@/components/Icons';
-import Drawer from '@/components/Drawer';
-import {printDiv} from '@/utils/utility';
+import Icon from '@/components/Icons';
+import { downloadImage, printDiv } from '@/utils/utility';
+import Employees from './components/Employees';
 const Tree = dynamic(() => import('react-organizational-chart').then(mod => mod.Tree), { ssr: false });
 const TreeNode = dynamic(() => import('react-organizational-chart').then(mod => mod.TreeNode), { ssr: false });
 
@@ -17,31 +18,17 @@ interface TreeNodeData {
 }
 
 const OrgChartPage: React.FC = () => {
+  const captureRef = useRef<HTMLDivElement>(null);
+  const employeesRef = useRef(null);
+
   useEffect(() => {
     window.onafterprint = function () {
       // Reload the page after print
       window.location.reload();
     };
-  }, [])
-  // Organize data with type-safe structure
-  const [orgData, setOrgData] = useState<TreeNodeData[]>([
-    {
-      id: 1, name: 'Bing Tan', position: 'CEO', children: [
+  }, []);
 
-        { id: 2, name: 'Laarni Manlangit', position: 'Human Resource' },
-        {
-          id: 5, name: 'Fervi', position: 'Project Manager', children: [
-            { id: 5.1, name: 'Tonio', position: 'Senior Software Engr.' },
-            { id: 5.2, name: 'Nathan', position: 'Senior Software Engr.' },
-            { id: 5.2, name: 'Jan', position: 'Junior Software Engr.' },
-          ]
-
-        },
-        { id: 3, name: 'Dhom', position: 'Project Manager' },
-        { id: 4, name: 'Bon', position: 'Project Manager' },
-      ]
-    }
-  ]);
+  const [orgData, setOrgData] = useState<TreeNodeData[]>([]);
 
   // Handle drag start, storing the dragged node's data
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, node: TreeNodeData) => {
@@ -61,9 +48,13 @@ const OrgChartPage: React.FC = () => {
     // First, remove the dragged node from its original position
     const updatedOrgData = removeNode(orgData, draggedNode);
     // Then, add the node to the new target node
-    const finalOrgData = updateTree(updatedOrgData, draggedNode, targetNode);
-
-    setOrgData(finalOrgData);
+    if (targetNode.id !== draggedNode.id) {
+      const finalOrgData = updateTree(updatedOrgData, draggedNode, targetNode);
+      setOrgData(finalOrgData);
+      if (employeesRef.current) {
+        employeesRef.current.removeEmployee(draggedNode.id)
+      }
+    }
   };
 
   const removeNode = (tree: TreeNodeData[], nodeToRemove: TreeNodeData): TreeNodeData[] => {
@@ -114,20 +105,27 @@ const OrgChartPage: React.FC = () => {
 
 
   const download = () => {
-    alert("download")
+    downloadImage("orgchart")
   }
 
   const extraButton = (
     <div className='flex'>
-      <Drawer className="mr-5" />
-      <Button type='dropdown' label={<IconSettings />}>
-        <li onClick={() => printDiv("orgchart")}><a><IconPrint /> Print</a></li>
-        <li onClick={download}><a><IconDownload />Download</a></li>
+      <Button type='dropdown' label={<Icon.Settings />}>
+        <li onClick={() => printDiv("orgchart")}><a><Icon.Print /> Print</a></li>
+        <li onClick={download}><a><Icon.Download />Download</a></li>
       </Button>
-
     </div >
   );
 
+  const handleParentDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    const draggedNode: TreeNodeData = JSON.parse(e.dataTransfer.getData('node'));
+    if (orgData.length === 0) {
+      setOrgData([draggedNode]);
+      if (employeesRef.current) {
+        employeesRef.current.removeEmployee(draggedNode.id)
+      }
+    }
+  };
   return (
     <Card
       title="Organizational Chart"
@@ -135,21 +133,36 @@ const OrgChartPage: React.FC = () => {
         extraButton
       }
     >
-      <div id="orgchart">
-        <Tree
-
-          label={
-            <StyledTreeNode
-              handleDragStart={handleDragStart}
-              handleDragOver={handleDragOver}
-              handleDrop={handleDrop}
-              node={orgData[0]}
-            />
-          }
-        >
-          {renderTreeNodes(orgData[0].children!)}
-        </Tree>
+      <div className="flex space-x-1">
+        <div className="w-[85%] over-flow-auto">
+          <div
+            id="orgchart"
+            ref={captureRef}
+            className='m-w-200 h-[calc(100vh-200px)]'
+            onDrop={(e: React.DragEvent<HTMLDivElement>) => handleParentDrop(e)}
+            onDragOver={(e: React.DragEvent<HTMLDivElement>) => handleDragOver(e)}
+          >
+            {orgData.length > 0 &&
+              <Tree
+                label={
+                  <StyledTreeNode
+                    handleDragStart={handleDragStart}
+                    handleDragOver={handleDragOver}
+                    handleDrop={handleDrop}
+                    node={orgData[0]}
+                  />
+                }
+              >
+                {renderTreeNodes(orgData[0].children!)}
+              </Tree>
+            }
+          </div>
+        </div>
+        <div className="w-[15%] bg-base-200 p-3">
+          <Employees ref={employeesRef} />
+        </div>
       </div>
+
     </Card>
   )
 }
